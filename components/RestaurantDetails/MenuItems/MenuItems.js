@@ -1,28 +1,32 @@
 import { StyleSheet, Text, View,Image,ScrollView } from 'react-native'
 import React from 'react'
+import { Divider } from 'react-native-elements';
+import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-
+ 
  const foods = [
     {
       title: "Beachside Bar",
       image:
         "https://static.onecms.io/wp-content/uploads/sites/9/2020/04/24/ppp-why-wont-anyone-rescue-restaurants-FT-BLOG0420.jpg",
       description: "Cafe",
-      price: "$$",
+      price: "15.20",
     },
     {
       title: "Benihana",
       image:
         "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cmVzdGF1cmFudCUyMGludGVyaW9yfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80",
       description: "test",
-      price: "$$"
+      price: "$13.50"
     },
     {
       title: "India's Grill",
       image:
         "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cmVzdGF1cmFudCUyMGludGVyaW9yfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80",
       description: "Indian",
-      price: "$$",
+      price: "$25",
     },
     {
       title: "India' saup",
@@ -33,17 +37,46 @@ import React from 'react'
     },
   ];
 
-const MenuItems = () => {
+
+
+const MenuItems = ({restaurantName}) => {
+
+const dispatch = useDispatch()
+const selectItem =(item,checkboxValue)=>dispatch({
+    type: "ADD_TO_CART",
+    payload:{
+            ...item, 
+            restaurantName:restaurantName,
+            checkboxValue:checkboxValue
+        },
+    
+})
+
+const cartItems = useSelector (
+  (state) => state.cartReducer.selectedItems.items
+)
+
+const isFoodInCart = (food, cartItems) =>
+    Boolean(cartItems.find((item) => item.title === food.title))
+  
   
     return (
         <ScrollView showsVerticalScrollIndicator={false}>
           {foods.map((food, index) => (
             <View key={index}>
               <View style={styles.MenuItems}>
-               
+                <BouncyCheckbox
+                  iconStyle={{ borderColor: "lightgray", borderRadius: 0 }}
+                  fillColor="green"
+                  isChecked={isFoodInCart(food, cartItems)}
+                  onPress={(checkboxValue) => selectItem(food, checkboxValue)}
+                />
                 <FoodInfo food={food} />
                 <FoodImage food={food} />
               </View>
+              <Divider width={0.5} orientation='vertical' 
+                 style={{marginHorizontal:20,}}
+              />
              
             </View>
           ))}
@@ -75,7 +108,7 @@ const styles = StyleSheet.create({
     MenuItems:{
         flexDirection : "row",
         justifyContent : "space-between",
-        margin: 20,
+        margin: 5,
     },
     title: {
         fontSize: 19,
